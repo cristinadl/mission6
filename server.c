@@ -157,51 +157,45 @@ void * clientHandleThread(void * args) {
 
 
 
+
   int processedChars = 0;
   char buffer[256];
   char process[50];
   char filename[20];
 
+  processedChars = read(threadData->clientData.clientDesc, process, 30);
+
+  write(threadData->clientData.clientDesc, "Hola", strlen("Hola"));
+
+
+
   FILE * fileHandler;
 
   while (1) {
-    processedChars = read(threadData->clientData.clientDesc, process, 49);
+    //processedChars = read(threadData->clientData.clientDesc, process, 49);
 
     // create file
-    if(strcmp(process, "NEWFILE") == 0) {
-      // read filename
-      processedChars = read(threadData->clientData.clientDesc, filename, 19);
-      fileHandler = fopen(filename, "wb");
-      // receive all data
-      while ((processedChars = read(threadData->clientData.clientDesc, buffer, 255)) > 0) {
-        for(int i = 0; i < processedChars; i++) {
-          fputc(buffer[i], fileHandler);
-        }
-      }
-
-      fclose(fileHandler);
-    }
     // edit file
-    if(strcmp(process, "EDITFILE") == 0) {
+    
       // get filename
       processedChars = read(threadData->clientData.clientDesc, filename, 19);
+
+      printf("antes de filename:%s\n",filename);
+      int wasRemoved = remove(filename);
+      printf("después de filename:%s\n",filename);
       fileHandler = fopen(filename, "wb");
+      
       // read all data 
       while ((processedChars = read(threadData->clientData.clientDesc, buffer, 255)) > 0) {
         for(int i = 0; i < processedChars; i++) {
           fputc(buffer[i], fileHandler);
         }
       }
-
-      fclose(fileHandler);
-    }
     // remove file
-    if(strcmp(process, "DELETEFILE") == 0) {
+
       // get filename
-      processedChars = read(threadData->clientData.clientDesc, filename, 19);
       // reove file
-      int wasRemoved = remove(filename);
-    }
+  
   }
 
   pthread_mutex_lock(&mutex);

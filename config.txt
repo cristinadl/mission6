@@ -1,0 +1,3 @@
+client 1
+localhost
+8889
